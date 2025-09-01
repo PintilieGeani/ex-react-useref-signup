@@ -1,16 +1,19 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 function App() {
-
-  const [nome, setNome] = useState("")
+// Stati
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [spec, setSpec] = useState("")
-  const [exp, setExp] = useState(0)
   const [description, setDescription] = useState("")
   const [pwdValid, setPwdValid] = useState(false)
   const [userValid, setUserValid] = useState(false)
   const [descriptionValid, setDescriptionValid] = useState(false)
+
+  // Campi non controllati con useRef
+  const nomeRef = useRef()
+  const specRef = useRef()
+  const expRef = useRef()
+
 
   // Array per le validazioni della password
   const letters = "abcdefghijklmnopqrstuvwxyz";
@@ -22,46 +25,49 @@ function App() {
     setPassword(e.target.value)
   }
 
-  const handleExp = (e) => {
-    e.preventDefault()
-    if (e.target.value < 0) {
-      console.log("Esperienza negativa")
-      return
-    } else {
-      setExp(e.target.value)
-    }
-  }
+  
 
-  const handleSpec = (e) => {
-    e.preventDefault()
-    setSpec(e.target.value)
-  }
 
   const handleForm = (e) => {
     e.preventDefault()
-    if (spec === "") {
+    if (specRef.current.value === "") {
       console.log("Seleziona la Specializzazione")
       return
     }
+    if(!descriptionValid){
+      console.log("Descrizione non valida")
+      return
+    }
+    if(!userValid){
+      console.log("Username non valido")
+      return
+    }
+    if(!pwdValid){
+      console.log("Password non valida")
+      return
+    }
     console.log({
-      nome: nome,
+      nome: nomeRef.current.value,
       username: username,
       password: password,
-      specializzazione: spec,
-      esperienza: exp,
+      specializzazione: specRef.current.value,
+      esperienza: expRef.current.value,
       descrizione: description
     })
   }
 
 
 
+
   useEffect(() => {
     const validazionePwd = () => {
-      const hasNumber = numbers.split("").some((num) => password.includes(num));
-      const hasLetter = letters.split("").some((lett) => password.includes(lett));
-      const hasSymbol = symbols.split("").some((elem) => password.includes(elem));
+      const hasNumber = password.split("").some((num) => numbers.includes(num));
+      const hasLetter = password.split("").some((lett) => lett.includes(lett));
+      const hasSymbol = password.split("").some((elem) => symbols.includes(elem));
       if(hasNumber && hasLetter && hasSymbol){
         setPwdValid(true)
+      }else{
+        setPwdValid(false)
       }
     };
 
@@ -88,6 +94,21 @@ function App() {
     }
   },[description])
 
+  useEffect(() => {
+    nomeRef.current.focus()
+  },[])
+
+
+  const handleReset = () => {
+    setDescription("")
+    setPassword("")
+    setUsername("")
+    nomeRef.current.value = ""
+    expRef.current.value = ""
+    specRef.current.value = ""
+  }
+
+
   return (
     <>
       <div className="container">
@@ -95,8 +116,7 @@ function App() {
           <input
             type="text"
             placeholder="Nome Completo"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
+            ref={nomeRef}
           />
           <input
             type="text"
@@ -117,8 +137,7 @@ function App() {
           <select
             name="Seleziona specializzazione"
             id="Spec"
-            value={spec}
-            onChange={handleSpec}
+            ref={specRef}
           >
             <option value="">Specializzazione</option>
             <option value="Front-end">Front-end</option>
@@ -129,8 +148,7 @@ function App() {
             type="number"
             placeholder="Anni di esperienza"
             min={1}
-            value={exp}
-            onChange={handleExp}
+            ref={expRef}
           />
           <textarea
             name="Text-area"
@@ -142,9 +160,20 @@ function App() {
           </textarea>
           <p className={descriptionValid ? "valid" : "invalid"}>{descriptionValid ? "Descrizione valida" : "La descrizione deve contenere almeno 100 caratteri ma meno di 1000"}</p>
 
-          <button type="submit">Submit</button>
+          <button 
+          type="submit"
+          >Submit</button>
+          <button 
+          type="button"
+          onClick={handleReset}
+          >RESET</button>
         </form>
-
+      <div 
+      onClick={() => nomeRef.current.focus()}
+      className="arrow"
+      >
+        <p >&uarr;</p>
+      </div>
       </div>
     </>
   )
