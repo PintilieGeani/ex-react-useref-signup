@@ -1,13 +1,18 @@
 import { useState, useEffect, useRef } from "react"
 
 function App() {
-// Stati
+  // Stati
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [description, setDescription] = useState("")
   const [pwdValid, setPwdValid] = useState(false)
   const [userValid, setUserValid] = useState(false)
   const [descriptionValid, setDescriptionValid] = useState(false)
+
+  // Effetto di vetro rotto, scomparsa e ricomparsa del nuovo form al click su reset
+  const [formState, setFormState] = useState("normal")
+  // "normal", "broken", "collapsing", "hiden", "reappearing"
+
 
   // Campi non controllati con useRef
   const nomeRef = useRef()
@@ -25,7 +30,7 @@ function App() {
     setPassword(e.target.value)
   }
 
-  
+
 
 
   const handleForm = (e) => {
@@ -34,15 +39,15 @@ function App() {
       console.log("Seleziona la Specializzazione")
       return
     }
-    if(!descriptionValid){
+    if (!descriptionValid) {
       console.log("Descrizione non valida")
       return
     }
-    if(!userValid){
+    if (!userValid) {
       console.log("Username non valido")
       return
     }
-    if(!pwdValid){
+    if (!pwdValid) {
       console.log("Password non valida")
       return
     }
@@ -64,9 +69,9 @@ function App() {
       const hasNumber = password.split("").some((num) => numbers.includes(num));
       const hasLetter = password.split("").some((lett) => lett.includes(lett));
       const hasSymbol = password.split("").some((elem) => symbols.includes(elem));
-      if(hasNumber && hasLetter && hasSymbol){
+      if (hasNumber && hasLetter && hasSymbol) {
         setPwdValid(true)
-      }else{
+      } else {
         setPwdValid(false)
       }
     };
@@ -77,9 +82,9 @@ function App() {
   useEffect(() => {
     const validazioneUsername = () => {
       const hasSymbol = symbols.split("").some((elem) => username.includes(elem))
-      if(username.length > 6 && hasSymbol === false){
+      if (username.length > 6 && hasSymbol === false) {
         setUserValid(true)
-      }else{
+      } else {
         setUserValid(false)
       }
     }
@@ -87,36 +92,60 @@ function App() {
   }, [username])
 
   useEffect(() => {
-    if(description.trim().length > 100 && description.trim().length < 1000){
+    if (description.trim().length > 100 && description.trim().length < 1000) {
       setDescriptionValid(true)
-    }else{
+    } else {
       setDescriptionValid(false)
     }
-  },[description])
+  }, [description])
 
   useEffect(() => {
     nomeRef.current.focus()
-  },[])
+  }, [])
 
 
   const handleReset = () => {
-    setDescription("")
-    setPassword("")
-    setUsername("")
-    nomeRef.current.value = ""
-    expRef.current.value = ""
-    specRef.current.value = ""
+
+
+    setFormState("broken")
+
+    setTimeout(() => {
+      setFormState("collapsing")
+    }, 1000);
+
+    setTimeout(() => {
+      setFormState("hidden")
+      setDescription("")
+      setPassword("")
+      setUsername("")
+      nomeRef.current.value = ""
+      expRef.current.value = ""
+      specRef.current.value = ""
+    }, 1600);
+
+    setTimeout(() => {
+      setFormState("reappearing")
+    }, 2100);
+
+    setTimeout(() => {
+      setFormState("normal")
+    }, 2700);
   }
 
+
+  // Correzione: Per ogni validazione che ho fatto con useEffect e useState potevo farlo con useMemo in un colpo solo. Ricorda che useMemo ha chiede un return
 
   return (
     <>
       <div className="container">
         <h1>Inserisci i tuoi dati</h1>
-        <form 
-        className="glass"
-        onSubmit={handleForm}
+        <form
+          className={`glass glass-form ${formState}`}
+          onSubmit={handleForm}
         >
+          {formState === "broken" &&
+            <img className="broken-overlay" src="/vetro_rotto.png" alt="vetro rotto" />
+          }
           <input
             type="text"
             placeholder="Nome Completo"
@@ -129,7 +158,7 @@ function App() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <p className={userValid? "valid" : "invalid"}>{userValid ? "Username Valido" : "Username deve contenere almeno 6 caratteri alfanumerici senza simboli o spazi"}</p>
+          <p className={userValid ? "valid" : "invalid"}>{userValid ? "Username Valido" : "Username deve contenere almeno 6 caratteri alfanumerici senza simboli o spazi"}</p>
           <input
             type="password"
             placeholder="Password"
@@ -163,23 +192,23 @@ function App() {
           >
           </textarea>
           <p className={descriptionValid ? "valid" : "invalid"}>{descriptionValid ? "Descrizione valida" : "La descrizione deve contenere almeno 100 caratteri ma meno di 1000"}</p>
-          
+
           <div className="buttons">
-          <button 
-          type="submit"
-          >Submit</button>
-          <button 
-          type="button"
-          onClick={handleReset}
-          >RESET</button>
+            <button
+              type="submit"
+            >Submit</button>
+            <button
+              type="button"
+              onClick={handleReset}
+            >RESET</button>
           </div>
         </form>
-      <div 
-      onClick={() => nomeRef.current.focus()}
-      className="arrow glass"
-      >
-        <p >&uarr;</p>
-      </div>
+        <div
+          onClick={() => nomeRef.current.focus()}
+          className="arrow glass"
+        >
+          <p >&uarr;</p>
+        </div>
       </div>
     </>
   )
