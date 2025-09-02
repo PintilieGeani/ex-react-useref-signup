@@ -112,7 +112,11 @@ function App() {
   return (
     <>
       <div className="container">
-        <form onSubmit={handleForm}>
+        <h1>Inserisci i tuoi dati</h1>
+        <form 
+        className="glass"
+        onSubmit={handleForm}
+        >
           <input
             type="text"
             placeholder="Nome Completo"
@@ -159,7 +163,8 @@ function App() {
           >
           </textarea>
           <p className={descriptionValid ? "valid" : "invalid"}>{descriptionValid ? "Descrizione valida" : "La descrizione deve contenere almeno 100 caratteri ma meno di 1000"}</p>
-
+          
+          <div className="buttons">
           <button 
           type="submit"
           >Submit</button>
@@ -167,10 +172,11 @@ function App() {
           type="button"
           onClick={handleReset}
           >RESET</button>
+          </div>
         </form>
       <div 
       onClick={() => nomeRef.current.focus()}
-      className="arrow"
+      className="arrow glass"
       >
         <p >&uarr;</p>
       </div>
